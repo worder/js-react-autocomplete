@@ -1,0 +1,39 @@
+.autocomplete {
+  position: relative;
+}
+
+.autocomplete__input {
+  box-sizing: border-box;
+  border: 1px solid;
+  height: 25px;
+  width: 200px;
+}
+
+.autocomplete__items {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  position: absolute;
+  top: 24px;
+  border: 1px solid;
+}
+
+.autocomplete__items--hidden {
+  display: none;
+}
+
+.autocomplete__items--fetching {
+}
+
+.autocomplete__item {
+  padding: 5px;
+}
+
+.autocomplete__item--selected {
+  font-weight: bold;
+  background-color: salmon;
+}
+
+.autocomplete__item--hover {
+}

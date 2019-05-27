@@ -2,11 +2,16 @@ import React from "react";
 import Autocomplete from "./Autocomplete/Autocomplete";
 import axios from "axios";
 
-const fetchSuggestions = (value, cb) => {
-  axios.get(`https://restcountries.eu/rest/v2/name/${value}`).then(res => {
-    cb(res.data.reduce((a, v) => (a.push(v.name), a), []));
-  });
-};
+function* fetchSuggestions(value, cb) {
+  try {
+    const res = yield axios.get(
+      `https://restcountries.eu/rest/v2/name/${value}`
+    );
+    return res.data.reduce((a, v) => a.push(v.name) && a, []).slice(0, 10);
+  } catch (err) {
+    return [];
+  }
+}
 
 const App = () => (
   <React.Fragment>
