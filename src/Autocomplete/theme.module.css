@@ -36,4 +36,5 @@
 }
 
 .autocomplete__item--hover {
+  background-color: violet;
 }

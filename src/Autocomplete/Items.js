@@ -1,52 +1,52 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import Item from "./Item";
+import Item from './Item';
 
-class Items extends Component {
-  render() {
-    const {
-      items,
-      theme,
-      visible,
-      renderItem,
-      onItemSelect,
-      selectedItemIndex,
-      ...props
-    } = this.props;
-
-    let itemsStyles = ["autocomplete__items"];
-    if (items.length === 0 || !visible) {
-      itemsStyles.push("autocomplete__items--hidden");
-    }
-
-    return (
-      <ul {...theme("ac-items", ...itemsStyles)} {...props}>
-        {items.map((itemData, i) => (
-          <Item
-            key={`ac-item-${i}`}
-            theme={theme}
-            renderItem={renderItem}
-            onClick={() => onItemSelect(i)}
-            selected={i === selectedItemIndex}
-            itemData={itemData}
-          />
-        ))}
-      </ul>
-    );
+const Items = ({
+  items,
+  theme,
+  visible,
+  renderItem,
+  onItemSelect,
+  selectedItemIndex,
+  ...props
+}) => {
+  const itemsStyles = ['autocomplete__items'];
+  if (items.length === 0 || !visible) {
+    itemsStyles.push('autocomplete__items--hidden');
   }
-}
+
+  return (
+    <ul {...theme('ac-items', ...itemsStyles)} {...props}>
+      {items.map((itemData, i) => (
+        <Item
+          // eslint-disable-next-line react/no-array-index-key
+          key={i}
+          itemIndex={i}
+          theme={theme}
+          renderItem={renderItem}
+          onItemSelect={onItemSelect}
+          selected={i === selectedItemIndex}
+          itemData={itemData}
+        />
+      ))}
+    </ul>
+  );
+};
 
 Items.propTypes = {
-  items: PropTypes.array,
-  theme: PropTypes.func,
-  visible: PropTypes.bool,
-  renderItem: PropTypes.func,
-  onItemSelect: PropTypes.func
+  // eslint-disable-next-line react/forbid-prop-types
+  items: PropTypes.array.isRequired,
+  theme: PropTypes.func.isRequired,
+  visible: PropTypes.bool.isRequired,
+  renderItem: PropTypes.func.isRequired,
+  onItemSelect: PropTypes.func.isRequired,
+  selectedItemIndex: PropTypes.number
 };
 
 Items.defaultProps = {
-  visible: true
+  selectedItemIndex: null
 };
 
 export default Items;
