@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import themeable from 'react-themeable';
 import PropTypes from 'prop-types';
 import co from 'co';
+import _ from 'lodash';
 
 import Input from './Input';
 import Items from './Items';
@@ -24,10 +25,16 @@ class Autocomplete extends Component {
       itemsVisible: false
     };
 
-    this.selectItem = this.selectItem.bind(this);
+    this.setCurrentItem = this.setCurrentItem.bind(this);
+    this.confirmCurrentItem = this.confirmCurrentItem.bind(this);
   }
 
   componentWillMount() {
+    this.performFetchDebounced =
+      this.props.debounce > 0
+        ? _.debounce(this.performFetch, this.props.debounce)
+        : this.performFetch;
+
     document.addEventListener('mouseup', this.onDocumentMouseUp);
   }
 
@@ -48,10 +55,8 @@ class Autocomplete extends Component {
     this.hideItems();
   };
 
-  onInputChange = e => {
-    const { value } = e.target;
-
-    const { onSuggestionsRequested, onSuggestionsClearRequested } = this.props;
+  onInputChange = value => {
+    const { onSuggestionsClearRequested } = this.props;
 
     this.setState({ value, displayValue: value });
 
@@ -60,13 +65,7 @@ class Autocomplete extends Component {
         fetching: true
       });
 
-      const onlyFor = val => res => {
-        if (this.state.value === val) {
-          this.onSuggestionsFetched(res);
-        }
-      };
-
-      co(onSuggestionsRequested(value)).then(onlyFor(value));
+      this.performFetchDebounced(value);
     } else {
       onSuggestionsClearRequested.bind(this)();
     }
@@ -81,8 +80,25 @@ class Autocomplete extends Component {
     });
   }
 
-  getValueFromItem(item) {
-    return item;
+  setCurrentItem(selectedItemIndex) {
+    this.setState(prevState => {
+      return {
+        selectedItemIndex,
+        displayValue:
+          selectedItemIndex !== null
+            ? this.props.getDisplayValue(prevState.suggestions[selectedItemIndex])
+            : prevState.value
+      };
+    });
+  }
+
+  getCurrentItemData() {
+    const { suggestions, selectedItemIndex } = this.state;
+    if (selectedItemIndex !== null) {
+      return suggestions[selectedItemIndex];
+    }
+
+    return false;
   }
 
   moveCursor = n => {
@@ -100,7 +116,7 @@ class Autocomplete extends Component {
     } else {
       nextIndex = length - 1;
     }
-    this.selectItem(nextIndex);
+    this.setCurrentItem(nextIndex);
   };
 
   cursorUp = () => {
@@ -119,23 +135,31 @@ class Autocomplete extends Component {
     this.setState({ itemsVisible: false });
   };
 
-  selectItem(selectedItemIndex) {
-    this.setState(prevState => ({
-      selectedItemIndex,
-      displayValue: selectedItemIndex
-        ? this.getValueFromItem(prevState.suggestions[selectedItemIndex])
-        : prevState.value
-    }));
+  performFetch(value) {
+    const { onSuggestionsRequested } = this.props;
+
+    const onlyFor = val => res => {
+      if (this.state.value === val) {
+        this.onSuggestionsFetched(res);
+      }
+    };
+
+    co(onSuggestionsRequested(value)).then(onlyFor(value));
   }
 
-  renderItem(item) {
-    return item;
+  confirmCurrentItem() {
+    const currentItem = this.getCurrentItemData();
+    const { value, displayValue } = this.state;
+    this.props.onSelected(currentItem, currentItem ? displayValue : value);
+    this.hideItems();
   }
 
   render() {
     const styles = this.props.theme;
     const theme = themeable(styles);
     const { itemsVisible, displayValue, suggestions, selectedItemIndex } = this.state;
+
+    const renderItemWrap = getDisplayValue => item => this.props.renderItem(item, getDisplayValue);
 
     return (
       <div {...theme('ac-con', 'autocomplete')} data-autocomplete-container>
@@ -147,16 +171,16 @@ class Autocomplete extends Component {
           onMoveUp={this.cursorUp}
           onMoveDown={this.cursorDown}
           onShowItems={this.showItems}
-          onConfirm={this.hideItems}
+          onConfirm={this.confirmCurrentItem}
         />
         <Items
           theme={theme}
           items={suggestions}
           visible={itemsVisible}
           selectedItemIndex={selectedItemIndex}
-          renderItem={this.props.renderItem}
+          renderItem={renderItemWrap(this.props.getDisplayValue)}
           onItemSelect={i => {
-            this.selectItem(i);
+            this.setCurrentItem(i);
             this.hideItems();
           }}
         />
@@ -172,7 +196,10 @@ Autocomplete.propTypes = {
   theme: PropTypes.object,
   renderItem: PropTypes.func,
   onSuggestionsRequested: PropTypes.func,
-  onSuggestionsClearRequested: PropTypes.func
+  onSuggestionsClearRequested: PropTypes.func,
+  onSelected: PropTypes.func,
+  getDisplayValue: PropTypes.func,
+  debounce: PropTypes.number
 };
 
 Autocomplete.defaultProps = {
@@ -182,8 +209,13 @@ Autocomplete.defaultProps = {
   onSuggestionsClearRequested() {
     this.setState({ suggestions: [] });
   },
-  renderItem(item) {
+  onSelected() {},
+  renderItem(item, getDisplayValue) {
+    return getDisplayValue(item);
+  },
+  getDisplayValue(item) {
     return item;
   },
+  debounce: 100,
   theme: defaultTheme
 };

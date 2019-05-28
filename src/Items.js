@@ -25,10 +25,9 @@ const Items = ({
           key={i}
           itemIndex={i}
           theme={theme}
-          renderItem={renderItem}
           onItemSelect={onItemSelect}
           selected={i === selectedItemIndex}
-          itemData={itemData}
+          itemValue={renderItem(itemData)}
         />
       ))}
     </ul>

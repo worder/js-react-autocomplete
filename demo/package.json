@@ -1,0 +1,12 @@
+{
+  "name": "js-react-autocomplete-demo",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^0.18.0"
+  },
+  "peerDependencies": {
+    "react": "16.x"
+  },
+  "main": "./src/App.js"
+}

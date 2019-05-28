@@ -1,43 +1,25 @@
 {
-  "name": "react-app",
+  "name": "js-react-autocomplete",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.18.0",
-    "co": "^4.6.0",
-    "prop-types": "^15.7.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
+    "co": "4.x",
+    "lodash": "4.x",
+    "prop-types": "15.x",
     "react-themeable": "^1.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "start": "react-scripts start"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-config-react-app": "^4.0.1",
     "eslint-plugin-prettier": "^3.1.0",
     "prettier": "^1.17.1"
+  },
+  "peerDependencies": {
+    "react": "16.x",
+    "react-dom": "16.x"
   }
 }

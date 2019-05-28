@@ -23,7 +23,7 @@ class Item extends Component {
   }
 
   render() {
-    const { renderItem, itemIndex, itemData, selected, onItemSelect, theme, ...props } = this.props;
+    const { itemValue, itemIndex, selected, onItemSelect, theme, ...props } = this.props;
 
     const { hover } = this.state;
 
@@ -44,17 +44,15 @@ class Item extends Component {
         onMouseLeave={this.onMouseLeave}
         {...props}
       >
-        {renderItem(itemData)}
+        {itemValue}
       </li>
     );
   }
 }
 
 Item.propTypes = {
+  itemValue: PropTypes.string.isRequired,
   itemIndex: PropTypes.number.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  itemData: PropTypes.oneOfType([PropTypes.string, PropTypes.array, PropTypes.object]).isRequired,
-  renderItem: PropTypes.func.isRequired,
   theme: PropTypes.func.isRequired,
   onItemSelect: PropTypes.func.isRequired,
   selected: PropTypes.bool.isRequired
