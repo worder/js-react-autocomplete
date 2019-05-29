@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import Autocomplete from '../../src/Autocomplete';
+import Autocomplete from '../../'; // use package.json "main"
 
 function* fetchSuggestions(value) {
   try {

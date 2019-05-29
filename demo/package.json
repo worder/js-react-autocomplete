@@ -1,12 +1,34 @@
 {
-  "name": "js-react-autocomplete-demo",
+  "name": "vda-js-react-autocomplete-demo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/polyfill": "^7.4.4",
     "axios": "^0.18.0"
   },
-  "peerDependencies": {
-    "react": "16.x"
+  "scripts": {
+    "build": "rm -rf dist && mkdir dist && babel src -d dist",
+    "watch": "rm -rf dist && mkdir dist && babel src -w -d dist"
   },
-  "main": "./src/App.js"
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ],
+    "plugins": [
+      "babel-plugin-transform-class-properties"
+    ]
+  },
+  "peerDependencies": {
+    "react": "16.x",
+    "react-dom": "16.x"
+  },
+  "main": "./build/App.js",
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1"
+  }
 }
