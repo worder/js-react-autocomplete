@@ -8,7 +8,7 @@ const KEY_CODE_ENTER = 13;
 const Input = ({
   theme,
   value,
-  allowSelection,
+  allowTraversing,
   onMoveUp,
   onChange,
   onMoveDown,
@@ -18,37 +18,12 @@ const Input = ({
 }) => {
   const onKeyDown = e => {
     const { keyCode } = e;
-    const listTravelEvent = key => {
-      switch (key) {
-        case KEY_CODE_UP:
-          onMoveUp();
-          break;
-        case KEY_CODE_DOWN:
-          onMoveDown();
-          break;
-        case KEY_CODE_ENTER:
-          onConfirm();
-          break;
-        default:
-          break;
-      }
-    };
 
-    const visibilityStateEvent = key => {
-      switch (key) {
-        case KEY_CODE_DOWN:
-          onShowItems();
-          break;
-        default:
-          break;
-      }
-    };
-
-    if (!allowSelection) {
+    if (!allowTraversing) {
       switch (keyCode) {
         case KEY_CODE_DOWN:
           e.preventDefault();
-          visibilityStateEvent(keyCode);
+          onShowItems();
           break;
         default:
           break;
@@ -56,14 +31,25 @@ const Input = ({
     } else {
       switch (keyCode) {
         case KEY_CODE_UP:
-        case KEY_CODE_DOWN:
-        case KEY_CODE_ENTER:
           e.preventDefault();
-          listTravelEvent(keyCode);
+          onMoveUp();
+          break;
+        case KEY_CODE_DOWN:
+          e.preventDefault();
+          onMoveDown();
           break;
         default:
           break;
       }
+    }
+
+    switch (keyCode) {
+      case KEY_CODE_ENTER:
+        e.preventDefault();
+        onConfirm();
+        break;
+      default:
+        break;
     }
   };
 
@@ -85,7 +71,7 @@ Input.propTypes = {
   onChange: PropTypes.func.isRequired,
   onMoveUp: PropTypes.func.isRequired,
   onMoveDown: PropTypes.func.isRequired,
-  allowSelection: PropTypes.bool.isRequired,
+  allowTraversing: PropTypes.bool.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onShowItems: PropTypes.func.isRequired
 };

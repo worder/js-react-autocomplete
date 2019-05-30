@@ -105,18 +105,20 @@ class Autocomplete extends Component {
     const { selectedItemIndex } = this.state;
     const { length } = this.state.suggestions;
 
-    let nextIndex;
-    if (selectedItemIndex !== null) {
-      nextIndex = selectedItemIndex + n;
-      if (nextIndex < 0 || nextIndex >= length) {
-        nextIndex = null;
+    if (length > 0) {
+      let nextIndex;
+      if (selectedItemIndex !== null) {
+        nextIndex = selectedItemIndex + n;
+        if (nextIndex < 0 || nextIndex >= length) {
+          nextIndex = null;
+        }
+      } else if (n > 0) {
+        nextIndex = 0;
+      } else {
+        nextIndex = length - 1;
       }
-    } else if (n > 0) {
-      nextIndex = 0;
-    } else {
-      nextIndex = length - 1;
+      this.setCurrentItem(nextIndex);
     }
-    this.setCurrentItem(nextIndex);
   };
 
   cursorUp = () => {
@@ -166,7 +168,7 @@ class Autocomplete extends Component {
         <Input
           theme={theme}
           value={displayValue}
-          allowSelection={itemsVisible}
+          allowTraversing={itemsVisible}
           onChange={this.onInputChange}
           onMoveUp={this.cursorUp}
           onMoveDown={this.cursorDown}
