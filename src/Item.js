@@ -27,12 +27,12 @@ class Item extends Component {
 
     const { hover } = this.state;
 
-    const styles = ['autocomplete__item'];
+    const styles = ['item'];
     if (selected) {
-      styles.push('autocomplete__item--selected');
+      styles.push('itemSelected');
     }
     if (hover) {
-      styles.push('autocomplete__item--hover');
+      styles.push('itemHover');
     }
 
     return (

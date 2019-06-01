@@ -4,18 +4,18 @@
   "private": true,
   "main": "dist/Autocomplete.js",
   "dependencies": {
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "co": "4.x",
-    "lodash": "4.x",
-    "prop-types": "15.x",
-    "react-themeable": "^1.1.0",
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "concurrently": "^4.1.0"
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "co": "4.x",
+    "concurrently": "^4.1.0",
+    "lodash": "4.x",
+    "prop-types": "15.x",
+    "react-themeable": "^1.1.0"
   },
   "prettier": {
     "printWidth": 100,
@@ -23,7 +23,14 @@
   },
   "babel": {
     "presets": [
-      "@babel/preset-env",
+      [
+        "@babel/preset-env",
+        {
+          "exclude": [
+            "transform-regenerator"
+          ]
+        }
+      ],
       "@babel/preset-react"
     ],
     "plugins": [

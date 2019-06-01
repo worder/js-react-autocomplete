@@ -12,9 +12,9 @@ const Items = ({
   selectedItemIndex,
   ...props
 }) => {
-  const itemsStyles = ['autocomplete__items'];
+  const itemsStyles = ['items'];
   if (items.length === 0 || !visible) {
-    itemsStyles.push('autocomplete__items--hidden');
+    itemsStyles.push('itemsHidden');
   }
 
   return (

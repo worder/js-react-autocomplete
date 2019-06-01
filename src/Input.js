@@ -59,8 +59,8 @@ const Input = ({
       value={value}
       onChange={e => onChange(e.target.value)}
       onKeyDown={onKeyDown}
-      {...theme('ac-input', 'autocomplete__input')}
       {...props}
+      {...theme('ac-input', 'input')}
     />
   );
 };

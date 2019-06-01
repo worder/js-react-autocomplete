@@ -10,12 +10,22 @@ import _ from 'lodash';
 import Input from './Input';
 import Items from './Items';
 
-import defaultTheme from './theme.module.css';
+//import defaultTheme from './theme.module.css';
+
+const defaultTheme = {
+  container: 'autocomplete__container',
+  containerOpen: 'autocomplete__container--open',
+  input: 'autocomplete__input',
+  item: 'autocomplete__item',
+  itemSelected: 'autocomplete__item--selected',
+  itemHover: 'autocomplete__item--hover',
+  items: 'autocomplete__items',
+  itemHidden: 'autocomplete__items--hidden'
+};
 
 class Autocomplete extends Component {
   constructor() {
     super();
-
     this.state = {
       value: '',
       displayValue: '',
@@ -35,11 +45,15 @@ class Autocomplete extends Component {
         ? _.debounce(this.performFetch, this.props.debounce)
         : this.performFetch;
 
-    document.addEventListener('mouseup', this.onDocumentMouseUp);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mouseup', this.onDocumentMouseUp);
+    }
   }
 
   componentWillUnmount() {
-    document.removeEventListener('mouseup', this.onDocumentMouseUp);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('mouseup', this.onDocumentMouseUp);
+    }
   }
 
   onDocumentMouseUp = event => {
@@ -163,8 +177,13 @@ class Autocomplete extends Component {
 
     const renderItemWrap = getDisplayValue => item => this.props.renderItem(item, getDisplayValue);
 
+    const containerStyles = ['container'];
+    if (this.state.itemsVisible) {
+      containerStyles.push('containerOpen');
+    }
+
     return (
-      <div {...theme('ac-con', 'autocomplete')} data-autocomplete-container>
+      <div {...theme('ac-con', ...containerStyles)} data-autocomplete-container>
         <Input
           theme={theme}
           value={displayValue}
@@ -206,7 +225,7 @@ Autocomplete.propTypes = {
 
 Autocomplete.defaultProps = {
   *onSuggestionsRequested() {
-    return yield;
+    return null;
   },
   onSuggestionsClearRequested() {
     this.setState({ suggestions: [] });
@@ -216,6 +235,9 @@ Autocomplete.defaultProps = {
     return getDisplayValue(item);
   },
   getDisplayValue(item) {
+    if (typeof item === 'object') {
+      throw 'list item is object, you should implement getDisplayValue(item) function and pass it to autocomplete props';
+    }
     return item;
   },
   debounce: 100,
