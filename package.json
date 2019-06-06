@@ -1,22 +1,8 @@
 {
   "name": "js-react-autocomplete",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "main": "dist/Autocomplete.js",
-  "dependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/preset-react": "^7.0.0",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "co": "4.x",
-    "concurrently": "^4.1.0",
-    "lodash": "4.x",
-    "prop-types": "15.x",
-    "react-themeable": "^1.1.0"
-  },
   "prettier": {
     "printWidth": 100,
     "singleQuote": true
@@ -45,14 +31,30 @@
     }
   },
   "scripts": {
+    "clean": "rm -rf dist && mkdir dist",
     "install": "npm run build",
     "install-peers": "install-peerdeps -S eslint-config-airbnb && install-peerdeps -S eslint-config-prettier && install-peerdeps -S eslint-config-react-app",
-    "build-main": "rm -rf dist && mkdir dist && BABEL_ENV=\"production\" babel src -d dist --copy-files --verbose",
-    "build-demo": "cd demo && rm -rf dist && BABEL_ENV=\"production\" babel src -d dist --verbose",
-    "watch-main": "babel src -d dist -w --copy-files",
-    "watch-demo": "cd demo && babel src -d dist -w",
+    "build-main": "npm run clean && cross-env BABEL_ENV=\"production\" babel ./src -d ./dist --copy-files --verbose",
+    "build-demo": "rm -rf demo/dist && cross-env BABEL_ENV=\"production\" babel demo/src -d demo/dist --verbose",
+    "watch-main": "babel ./src -d ./dist -w --copy-files",
+    "watch-demo": "babel ./demo/src -d ./demo/dist -w",
     "build": "concurrently \"npm run build-main\" \"npm run build-demo\"",
     "watch": "concurrently \"npm run watch-main\" \"npm run watch-demo\""
+  },
+  "dependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "co": "4.x",
+    "concurrently": "^4.1.0",
+    "cross-env": "^5.2.0",
+    "lodash": "4.x",
+    "prop-types": "15.x",
+    "react-themeable": "^1.1.0"
   },
   "devDependencies": {
     "axios": "^0.18.0",
