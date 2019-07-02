@@ -1,19 +1,19 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const KEY_CODE_UP = 38;
-const KEY_CODE_DOWN = 40;
-const KEY_CODE_ENTER = 13;
+const KEY_CODE_UP = 38
+const KEY_CODE_DOWN = 40
+const KEY_CODE_ENTER = 13
 
 // eslint-disable-next-line react/prop-types
 const DefaultRender = ({ events, value, theme }) => (
   <input type="text" value={value} {...events} {...theme} />
-);
+)
 
 class Input extends React.Component {
   constructor(props) {
-    super(props);
-    this.input = React.createRef();
+    super(props)
+    this.input = React.createRef()
   }
 
   render() {
@@ -28,45 +28,45 @@ class Input extends React.Component {
       onConfirm,
       onShowItems,
       onFocus,
-      renderInput
-    } = this.props;
+      renderInput,
+    } = this.props
 
     const onKeyDown = e => {
-      const { keyCode } = e;
+      const { keyCode } = e
 
       if (!allowTraversing) {
         switch (keyCode) {
           case KEY_CODE_DOWN:
-            e.preventDefault();
-            onShowItems();
-            break;
+            e.preventDefault()
+            onShowItems()
+            break
           default:
-            break;
+            break
         }
       } else {
         switch (keyCode) {
           case KEY_CODE_UP:
-            e.preventDefault();
-            onMoveUp();
-            break;
+            e.preventDefault()
+            onMoveUp()
+            break
           case KEY_CODE_DOWN:
-            e.preventDefault();
-            onMoveDown();
-            break;
+            e.preventDefault()
+            onMoveDown()
+            break
           default:
-            break;
+            break
         }
       }
 
       switch (keyCode) {
         case KEY_CODE_ENTER:
-          e.preventDefault();
-          onConfirm();
-          break;
+          e.preventDefault()
+          onConfirm()
+          break
         default:
-          break;
+          break
       }
-    };
+    }
 
     const inputProps = {
       value,
@@ -74,14 +74,14 @@ class Input extends React.Component {
       events: {
         onChange: e => onChange(e.target.value),
         onKeyDown,
-        onFocus
+        onFocus,
       },
-      theme: theme('ac-input', 'input')
-    };
+      theme: theme('ac-input', 'input'),
+    }
 
-    const InputComp = renderInput || DefaultRender;
+    const InputComp = renderInput || DefaultRender
 
-    return <InputComp {...inputProps} />;
+    return <InputComp {...inputProps} />
   }
 }
 
@@ -96,11 +96,11 @@ Input.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   onShowItems: PropTypes.func.isRequired,
   renderInput: PropTypes.func,
-  progress: PropTypes.bool.isRequired
-};
+  progress: PropTypes.bool.isRequired,
+}
 
 Input.defaultProps = {
-  renderInput: null
-};
+  renderInput: null,
+}
 
-export default Input;
+export default Input

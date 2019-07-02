@@ -1,11 +1,9 @@
-import React, { Component } from 'react';
-import themeable from 'react-themeable';
-import PropTypes from 'prop-types';
-import co from 'co';
-import _ from 'lodash';
+import React, { Component } from 'react'
+import themeable from 'react-themeable'
+import PropTypes from 'prop-types'
 
-import Input from './Input';
-import Items from './Items';
+import Input from './Input'
+import Items from './Items'
 
 const defaultTheme = {
   container: 'autocomplete__container',
@@ -15,189 +13,167 @@ const defaultTheme = {
   itemSelected: 'autocomplete__item--selected',
   itemHover: 'autocomplete__item--hover',
   items: 'autocomplete__items',
-  itemHidden: 'autocomplete__items--hidden'
-};
+  itemHidden: 'autocomplete__items--hidden',
+}
 
 class Autocomplete extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
-      value: '',
-      displayValue: props.value,
+      value: props.initialValue,
+      displayValue: props.initialValue,
       suggestions: [],
+      suggestionsForValue: '',
       selectedItemIndex: null,
-      closed: true
-    };
+      closed: true,
+    }
 
-    this.setCurrentItem = this.setCurrentItem.bind(this);
-    this.confirmCurrentItem = this.confirmCurrentItem.bind(this);
+    this.setCurrentItem = this.setCurrentItem.bind(this)
+    this.confirmCurrentItem = this.confirmCurrentItem.bind(this)
   }
 
   componentDidMount() {
-    const { debounce } = this.props;
-    this.performFetchDebounced =
-      debounce > 0 ? _.debounce(this.performFetch, debounce) : this.performFetch;
-
     if (typeof document !== 'undefined') {
-      document.addEventListener('mouseup', this.onDocumentMouseUp);
+      document.addEventListener('mouseup', this.onDocumentMouseUp)
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.state.suggestions !== this.props.suggestions) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState(prevState => ({
+        suggestions: this.props.suggestions,
+        suggestionsForValue: prevState.value,
+        selectedItemIndex: null,
+      }))
     }
   }
 
   componentWillUnmount() {
     if (typeof document !== 'undefined') {
-      document.removeEventListener('mouseup', this.onDocumentMouseUp);
+      document.removeEventListener('mouseup', this.onDocumentMouseUp)
     }
   }
 
   onDocumentMouseUp = event => {
     // walk tree
-    let node = event.target;
+    let node = event.target
     while (node !== null && node !== document) {
       if (node.getAttribute('data-autocomplete-container') === 'true') {
         // ignore clicks inside autocomplete
-        return;
+        return
       }
-      node = node.parentNode;
+      node = node.parentNode
     }
-    this.hideItems();
-  };
+    this.hideItems()
+  }
 
   onInputChange = value => {
-    const { onSuggestionsClearRequested, onChange } = this.props;
+    const { onChange } = this.props
 
     this.setState({
       value,
       displayValue: value,
-      closed: false
-    });
+      closed: false,
+    })
 
-    if (value.trim().length > 0) {
-      this.performFetchDebounced(value);
-    } else {
-      onSuggestionsClearRequested.bind(this)();
-    }
-
-    onChange(value);
-  };
-
-  onSuggestionsFetched(suggestions) {
-    this.setState({
-      suggestions: suggestions || [],
-      selectedItemIndex: null,
-      closed: false
-    });
+    onChange(value)
   }
 
   getSuggestions() {
-    // eslint-disable-next-line react/destructuring-assignment
-    return this.props.suggestions !== false ? this.props.suggestions : this.state.suggestions;
+    return this.state.suggestions
   }
 
   setCurrentItem(selectedItemIndex) {
-    const { getDisplayValue } = this.props;
-    const suggestions = this.getSuggestions();
+    const { itemToText } = this.props
+    const suggestions = this.getSuggestions()
     this.setState(prevState => ({
       selectedItemIndex,
       displayValue:
-        selectedItemIndex !== null
-          ? getDisplayValue(suggestions[selectedItemIndex])
-          : prevState.value
-    }));
+        selectedItemIndex !== null ? itemToText(suggestions[selectedItemIndex]) : prevState.value,
+    }))
   }
 
   getItemData(index) {
-    const suggestions = this.getSuggestions();
-    return suggestions[index] || false;
+    const suggestions = this.getSuggestions()
+    return suggestions[index] || false
   }
 
   moveCursor = n => {
-    const { selectedItemIndex } = this.state;
-    const { length } = this.getSuggestions();
+    const { selectedItemIndex } = this.state
+    const { length } = this.getSuggestions()
 
     if (length > 0) {
-      let nextIndex;
+      let nextIndex
       if (selectedItemIndex !== null) {
-        nextIndex = selectedItemIndex + n;
+        nextIndex = selectedItemIndex + n
         if (nextIndex < 0 || nextIndex >= length) {
-          nextIndex = null;
+          nextIndex = null
         }
       } else if (n > 0) {
-        nextIndex = 0;
+        nextIndex = 0
       } else {
-        nextIndex = length - 1;
+        nextIndex = length - 1
       }
-      this.setCurrentItem(nextIndex);
+      this.setCurrentItem(nextIndex)
     }
-  };
-
-  cursorUp = () => {
-    this.moveCursor(-1);
-  };
-
-  cursorDown = () => {
-    this.moveCursor(1);
-  };
-
-  showItems = () => {
-    this.setState({ closed: false });
-  };
-
-  hideItems = () => {
-    this.setState({ closed: true });
-  };
-
-  confirmItem = index => {
-    this.setCurrentItem(index);
-    const itemData = this.getItemData(index);
-    const { value } = this.state;
-    const { onSelected, onChange, getDisplayValue } = this.props;
-    let confirmedValue;
-    if (itemData) {
-      confirmedValue = getDisplayValue(itemData);
-    } else {
-      confirmedValue = value;
-    }
-    onSelected(itemData, confirmedValue);
-    onChange(confirmedValue);
-    this.hideItems();
-  };
-
-  confirmCurrentItem() {
-    const { selectedItemIndex } = this.state;
-    this.confirmItem(selectedItemIndex);
   }
 
-  performFetch(forValue) {
-    const { onSuggestionsRequested } = this.props;
-    if (onSuggestionsRequested) {
-      const onlyFor = val => res => {
-        // eslint-disable-next-line react/destructuring-assignment
-        if (this.state.value === val) {
-          this.onSuggestionsFetched(res);
-        }
-      };
-      co(onSuggestionsRequested(forValue)).then(onlyFor(forValue));
+  cursorUp = () => {
+    this.moveCursor(-1)
+  }
+
+  cursorDown = () => {
+    this.moveCursor(1)
+  }
+
+  showItems = () => {
+    this.setState({ closed: false })
+  }
+
+  hideItems = () => {
+    this.setState({ closed: true })
+  }
+
+  confirmItem = index => {
+    this.setCurrentItem(index)
+    const itemData = this.getItemData(index)
+    const { value } = this.state
+    const { onSelected, onChange, itemToText } = this.props
+    let confirmedValue
+    if (itemData) {
+      confirmedValue = itemToText(itemData)
+    } else {
+      confirmedValue = value
     }
+    onSelected(itemData, confirmedValue)
+    onChange(confirmedValue)
+    this.hideItems()
+  }
+
+  confirmCurrentItem() {
+    const { selectedItemIndex } = this.state
+    this.confirmItem(selectedItemIndex)
   }
 
   render() {
-    const styles = this.props.theme;
-    const theme = themeable(styles);
-    const { closed, displayValue, selectedItemIndex } = this.state;
+    const styles = this.props.theme
+    const theme = themeable(styles)
+    const { closed, displayValue, selectedItemIndex } = this.state
 
-    const suggestions = this.getSuggestions();
-    const listVisible = !closed && suggestions.length > 0;
-    const containerStyles = ['container'];
+    const suggestions = this.getSuggestions()
+    const listVisible = !closed && suggestions.length > 0
+    const containerStyles = ['container']
     if (listVisible) {
-      containerStyles.push('containerOpen');
+      containerStyles.push('containerOpen')
     }
 
     return (
       <div {...theme('ac-con', ...containerStyles)} data-autocomplete-container>
         <Input
-          renderInput={this.props.renderInput}
           theme={theme}
+          renderInput={this.props.renderInput}
           value={displayValue}
           progress={this.props.progress}
           allowTraversing={listVisible}
@@ -209,63 +185,65 @@ class Autocomplete extends Component {
           onConfirm={this.confirmCurrentItem}
         />
         <Items
+          theme={theme}
           renderItems={this.props.renderItems}
           renderItem={this.props.renderItem}
-          progress={this.props.progress}
-          theme={theme}
+          renderValue={this.props.renderValue}
+          itemToText={this.props.itemToText}
           items={suggestions}
+          inputValue={this.state.suggestionsForValue}
+          progress={this.props.progress}
           visible={listVisible}
           selectedItemIndex={selectedItemIndex}
-          getDisplayValue={this.props.getDisplayValue}
+          highlightWith={this.props.highlightWith}
+          highlightValue={this.props.highlightValue}
           onItemSelect={i => {
-            this.confirmItem(i);
-            this.hideItems();
+            this.confirmItem(i)
+            this.hideItems()
           }}
         />
       </div>
-    );
+    )
   }
 }
 
-export default Autocomplete;
+export default Autocomplete
 
 Autocomplete.propTypes = {
   theme: PropTypes.object,
-  onSuggestionsRequested: PropTypes.func,
-  onSuggestionsClearRequested: PropTypes.func,
   onSelected: PropTypes.func,
-  getDisplayValue: PropTypes.func,
-  debounce: PropTypes.number,
-  suggestions: PropTypes.array,
+  suggestions: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   progress: PropTypes.bool,
   onChange: PropTypes.func,
   renderItems: PropTypes.func,
   renderItem: PropTypes.func,
   renderInput: PropTypes.func,
-  value: PropTypes.string
-};
+  renderValue: PropTypes.func,
+  itemToText: PropTypes.func,
+  initialValue: PropTypes.string,
+  highlightWith: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  highlightValue: PropTypes.string,
+}
 
 Autocomplete.defaultProps = {
+  renderValue: null,
   renderItems: null,
   renderItem: null,
   renderInput: null,
-  onSuggestionsRequested: null,
-  onSuggestionsClearRequested() {
-    this.setState({ suggestions: [] });
-  },
   onSelected: () => {},
   onChange: () => {},
-  getDisplayValue(item) {
+  itemToText(item) {
     if (typeof item === 'object') {
       throw new Error(
-        'list item is object, you should implement getDisplayValue(item) function and pass it to autocomplete props'
-      );
+        'list item is object, you should implement itemToText(item) function and pass it to autocomplete props',
+      )
     }
-    return item;
+    return item
   },
-  debounce: 100,
   theme: defaultTheme,
   suggestions: false,
   progress: false,
-  value: ''
-};
+  initialValue: '',
+  highlightWith: null,
+  highlightValue: null,
+}
