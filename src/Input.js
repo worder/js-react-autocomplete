@@ -6,8 +6,8 @@ const KEY_CODE_DOWN = 40
 const KEY_CODE_ENTER = 13
 
 // eslint-disable-next-line react/prop-types
-const DefaultRender = ({ events, value, theme }) => (
-  <input type="text" value={value} {...events} {...theme} />
+const DefaultRender = ({ events, value, theme, placeholder }) => (
+  <input type="text" value={value} placeholder={placeholder} {...events} {...theme} />
 )
 
 class Input extends React.Component {
@@ -29,6 +29,7 @@ class Input extends React.Component {
       onShowItems,
       onFocus,
       renderInput,
+      placeholder,
     } = this.props
 
     const onKeyDown = e => {
@@ -71,6 +72,7 @@ class Input extends React.Component {
     const inputProps = {
       value,
       progress,
+      placeholder,
       events: {
         onChange: e => onChange(e.target.value),
         onKeyDown,

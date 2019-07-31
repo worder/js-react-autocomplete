@@ -45,7 +45,7 @@ Highlight.propTypes = {
 Highlight.defaultProps = {
   value: '',
   children: '',
-  as: 'b',
+  as: 'mark',
   normAs: 'span',
 }
 

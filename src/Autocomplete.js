@@ -39,13 +39,22 @@ class Autocomplete extends Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.state.suggestions !== this.props.suggestions) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => ({
         suggestions: this.props.suggestions,
         suggestionsForValue: prevState.value,
         selectedItemIndex: null,
+      }))
+    }
+    if (
+      !prevProps.initialValue &&
+      this.props.initialValue &&
+      prevProps.initialValue !== this.props.initialValue
+    ) {
+      this.setState(() => ({
+        displayValue: this.props.initialValue,
       }))
     }
   }
@@ -183,6 +192,7 @@ class Autocomplete extends Component {
           onShowItems={this.showItems}
           onFocus={this.showItems}
           onConfirm={this.confirmCurrentItem}
+          placeholder={this.props.placeholder}
         />
         <Items
           theme={theme}
@@ -221,8 +231,9 @@ Autocomplete.propTypes = {
   renderValue: PropTypes.func,
   itemToText: PropTypes.func,
   initialValue: PropTypes.string,
-  highlightWith: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  highlightWith: PropTypes.node,
   highlightValue: PropTypes.string,
+  placeholder: PropTypes.string,
 }
 
 Autocomplete.defaultProps = {
@@ -246,4 +257,5 @@ Autocomplete.defaultProps = {
   initialValue: '',
   highlightWith: null,
   highlightValue: null,
+  placeholder: '',
 }
